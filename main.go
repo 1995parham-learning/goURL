@@ -3,20 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
+	"goURL/http"
 	"os"
 	"regexp"
 	"strings"
-)
-
-const (
-	GET = "GET"
-	POST = "POST"
-	PATCH = "PATCH"
-	DELETE = "DELETE"
-	PUT = "PUT"
 )
 
 // Created so that multiple inputs can be accecpted
@@ -69,46 +59,15 @@ func main() {
 
 	fmt.Println(warning)
 
-	switch *method {
-	case GET:
-		do(URL, GET)
-	case POST:
-		do(URL, POST)
-	case PATCH:
-		do(URL, PATCH)
-	case DELETE:
-		do(URL, DELETE)
-	case PUT:
-		do(URL, PUT)
-	default:
-		fmt.Println("Method is not recognized. Use GET, POST, PUT, PATCH and DELETE instead")
+	//url.Parse()
+
+	client := http.Client{
+		Method: *method,
+		URL:    URL,
 	}
 
-}
+	client.Do()
 
-func do(url string, method string) {
-	client := &http.Client{}
-
-	req, err := http.NewRequest(method, url, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	fmt.Println("Response status:", resp.Status)
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	sb := string(body)
-	log.Println(sb)
 }
 
 func Validate(url string) bool {
