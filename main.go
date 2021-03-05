@@ -22,16 +22,21 @@ func main() {
 
 	method := flag.String("M", "GET", "method")
 
-	var headerFlag http.HeaderFlag
+	var headerFlag http.ArrayFlag
+	var queryFlag http.ArrayFlag
 
 	flag.Var(&headerFlag, "H", "header")
+	flag.Var(&queryFlag, "Q", "query parameter")
 	flag.CommandLine.Parse(os.Args[2:])
 
-	header, warning := headerFlag.ToMap()
+	header, warning := headerFlag.ToHeaderMap()
+	fmt.Println(warning)
+
+	query, warning := queryFlag.ToHeaderMap()
 	fmt.Println(warning)
 	//url.Parse()
 
-	client := http.NewClient(*method, URL, header)
+	client := http.NewClient(*method, URL, header, query)
 	client.Do()
 
 }

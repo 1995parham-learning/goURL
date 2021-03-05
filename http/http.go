@@ -9,23 +9,23 @@ import (
 )
 
 // Created so that multiple inputs can be accecpted
-type HeaderFlag []string
+type ArrayFlag []string
 
-func (h *HeaderFlag) String() string {
+func (a *ArrayFlag) String() string {
 	// change this, this is just can example to satisfy the interface
 	return "my string representation"
 }
 
-func (h *HeaderFlag) Set(value string) error {
-	*h = append(*h, strings.TrimSpace(value))
+func (a *ArrayFlag) Set(value string) error {
+	*a = append(*a, strings.TrimSpace(value))
 	return nil
 }
 
-func (h *HeaderFlag) ToMap() (map[string][]string, string) {
+func (a *ArrayFlag) ToHeaderMap() (map[string][]string, string) {
 	header := make(map[string][]string)
 	warning := ""
 
-	for _, f := range *h {
+	for _, f := range *a {
 		a := strings.Split(f, ",")
 		for _, b := range a {
 			keyValue := strings.Split(b, ":")
@@ -41,6 +41,26 @@ func (h *HeaderFlag) ToMap() (map[string][]string, string) {
 	return header, warning
 }
 
+func (a *ArrayFlag) ToQueryMap() (map[string]string, string) {
+	query := make(map[string]string)
+	warning := ""
+
+	for _, q := range *a {
+		a := strings.Split(q, "&")
+		for _, b := range a {
+			keyValue := strings.Split(b, "=")
+			_, ok := query[keyValue[0]]
+			if ok {
+				warning += fmt.Sprintf("%s is a repetead header so only the last one is considered", keyValue[0])
+			}
+
+			query[keyValue[0]] = keyValue[1]
+		}
+	}
+
+	return query, warning
+}
+
 const (
 	GET    = "GET"
 	POST   = "POST"
@@ -53,22 +73,33 @@ type Client struct {
 	Method string
 	URL    string
 	Header map[string][]string
+	Query  map[string][]string
 }
 
-func NewClient(method string, url string, header map[string][]string) *Client {
+func NewClient(method string, url string, header map[string][]string, query map[string][]string) *Client {
 	if method != GET && method != POST && method != PATCH && method != PUT && method != DELETE {
 		panic("Method is not recognized. Use GET, POST, PUT, PATCH and DELETE instead")
 	}
+
+	url += "?"
+	for k, v := range query {
+		url += k + "=" + v[0] + "&"
+	}
+
+	url = strings.TrimSuffix(url, "&")
 
 	return &Client{
 		Method: method,
 		URL:    url,
 		Header: header,
+		Query:  query,
 	}
 }
 
 func (c *Client) Do() {
 	client := &http.Client{}
+
+	fmt.Println(c.URL)
 
 	req, err := http.NewRequest(c.Method, c.URL, nil)
 	if err != nil {
