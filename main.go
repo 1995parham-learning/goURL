@@ -21,22 +21,32 @@ func main() {
 	}
 
 	method := flag.String("M", "GET", "method")
+	body := flag.String("D", "", "body")
+	// --
+	json := flag.Bool("json", false, "content type header")
+	file := flag.String("file", "", "file path as body")
+	if *file != "" {
+		
+	}
 
 	var headerFlag http.ArrayFlag
 	var queryFlag http.ArrayFlag
 
 	flag.Var(&headerFlag, "H", "header")
 	flag.Var(&queryFlag, "Q", "query parameter")
-	flag.CommandLine.Parse(os.Args[2:])
+	err := flag.CommandLine.Parse(os.Args[2:])
+	if err != nil {
+		panic(err)
+	}
 
-	header, warning := headerFlag.ToHeaderMap()
+	header, warning := headerFlag.ToHeaderMap(*json)
 	fmt.Println(warning)
 
-	query, warning := queryFlag.ToHeaderMap()
+	query, warning := queryFlag.ToQueryMap()
 	fmt.Println(warning)
 	//url.Parse()
 
-	client := http.NewClient(*method, URL, header, query)
+	client := http.NewClient(*method, URL, header, query, *body)
 	client.Do()
 
 }

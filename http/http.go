@@ -1,6 +1,7 @@
 package http
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -21,7 +22,7 @@ func (a *ArrayFlag) Set(value string) error {
 	return nil
 }
 
-func (a *ArrayFlag) ToHeaderMap() (map[string][]string, string) {
+func (a *ArrayFlag) ToHeaderMap(json bool) (map[string][]string, string) {
 	header := make(map[string][]string)
 	warning := ""
 
@@ -35,6 +36,15 @@ func (a *ArrayFlag) ToHeaderMap() (map[string][]string, string) {
 			}
 
 			header[keyValue[0]] = []string{keyValue[1]}
+		}
+	}
+
+	_, ok := header["content-type"]
+	if !ok {
+		if json {
+			header["content-type"] = []string{"application/json"}
+		}else {
+			header["content-type"] = []string{"x-www-form-urlencoded"}
 		}
 	}
 
@@ -73,17 +83,19 @@ type Client struct {
 	Method string
 	URL    string
 	Header map[string][]string
-	Query  map[string][]string
+	Query  map[string]string
+	Body   string
 }
 
-func NewClient(method string, url string, header map[string][]string, query map[string][]string) *Client {
+func NewClient(method string, url string, header map[string][]string, query map[string]string, body string) *Client {
 	if method != GET && method != POST && method != PATCH && method != PUT && method != DELETE {
 		panic("Method is not recognized. Use GET, POST, PUT, PATCH and DELETE instead")
 	}
 
+	// check if there are query parameters
 	url += "?"
 	for k, v := range query {
-		url += k + "=" + v[0] + "&"
+		url += k + "=" + v + "&"
 	}
 
 	url = strings.TrimSuffix(url, "&")
@@ -93,6 +105,7 @@ func NewClient(method string, url string, header map[string][]string, query map[
 		URL:    url,
 		Header: header,
 		Query:  query,
+		Body:   body,
 	}
 }
 
@@ -101,7 +114,7 @@ func (c *Client) Do() {
 
 	fmt.Println(c.URL)
 
-	req, err := http.NewRequest(c.Method, c.URL, nil)
+	req, err := http.NewRequest(c.Method, c.URL, bytes.NewBuffer([]byte(c.Body)))
 	if err != nil {
 		panic(err)
 	}
