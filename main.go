@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"goURL/http"
+	"io/ioutil"
 	"os"
 	"regexp"
 )
@@ -25,8 +26,15 @@ func main() {
 	// --
 	json := flag.Bool("json", false, "content type header")
 	file := flag.String("file", "", "file path as body")
+	timeout := flag.Int("timeout", 0, "timeout")
+
 	if *file != "" {
-		
+		dat, err := ioutil.ReadFile(*file)
+		if err != nil {
+			panic(err)
+		}
+
+		*body = string(dat)
 	}
 
 	var headerFlag http.ArrayFlag
@@ -46,7 +54,7 @@ func main() {
 	fmt.Println(warning)
 	//url.Parse()
 
-	client := http.NewClient(*method, URL, header, query, *body)
+	client := http.NewClient(*method, URL, header, query, *body, *timeout)
 	client.Do()
 
 }

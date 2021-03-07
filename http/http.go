@@ -2,11 +2,13 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // Created so that multiple inputs can be accecpted
@@ -43,7 +45,7 @@ func (a *ArrayFlag) ToHeaderMap(json bool) (map[string][]string, string) {
 	if !ok {
 		if json {
 			header["content-type"] = []string{"application/json"}
-		}else {
+		} else {
 			header["content-type"] = []string{"x-www-form-urlencoded"}
 		}
 	}
@@ -80,14 +82,15 @@ const (
 )
 
 type Client struct {
-	Method string
-	URL    string
-	Header map[string][]string
-	Query  map[string]string
-	Body   string
+	Method  string
+	URL     string
+	Header  map[string][]string
+	Query   map[string]string
+	Body    string
+	Timeout int
 }
 
-func NewClient(method string, url string, header map[string][]string, query map[string]string, body string) *Client {
+func NewClient(method string, url string, header map[string][]string, query map[string]string, body string, timeout int) *Client {
 	if method != GET && method != POST && method != PATCH && method != PUT && method != DELETE {
 		panic("Method is not recognized. Use GET, POST, PUT, PATCH and DELETE instead")
 	}
@@ -101,11 +104,12 @@ func NewClient(method string, url string, header map[string][]string, query map[
 	url = strings.TrimSuffix(url, "&")
 
 	return &Client{
-		Method: method,
-		URL:    url,
-		Header: header,
-		Query:  query,
-		Body:   body,
+		Method:  method,
+		URL:     url,
+		Header:  header,
+		Query:   query,
+		Body:    body,
+		Timeout: timeout,
 	}
 }
 
@@ -114,7 +118,10 @@ func (c *Client) Do() {
 
 	fmt.Println(c.URL)
 
-	req, err := http.NewRequest(c.Method, c.URL, bytes.NewBuffer([]byte(c.Body)))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * time.Duration(c.Timeout))
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, c.Method, c.URL, bytes.NewBuffer([]byte(c.Body)))
 	if err != nil {
 		panic(err)
 	}
