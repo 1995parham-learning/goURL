@@ -26,7 +26,7 @@ func main() {
 	// --
 	json := flag.Bool("json", false, "content type header")
 	file := flag.String("file", "", "file path as body")
-	timeout := flag.Int("timeout", 0, "timeout")
+	timeout := flag.Int("timeout", 1000, "timeout")
 
 	if *file != "" {
 		dat, err := ioutil.ReadFile(*file)

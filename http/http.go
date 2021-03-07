@@ -130,11 +130,21 @@ func (c *Client) Do() {
 
 	resp, err := client.Do(req)
 	if err != nil {
+		if err == context.DeadlineExceeded {
+			fmt.Println(err)
+			return
+		}
 		panic(err)
 	}
 	defer resp.Body.Close()
 
+	fmt.Println("Method is:", c.Method)
 	fmt.Println("Response status:", resp.Status)
+	fmt.Println("headers are:")
+
+	for k, v := range resp.Header{
+		fmt.Println(fmt.Sprintf("%s = %s", k, v))
+	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
