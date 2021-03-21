@@ -14,14 +14,10 @@ import (
 // Created so that multiple inputs can be accecpted
 type ArrayFlag []string
 
-func (a *ArrayFlag) String() string {
-	// change this, this is just can example to satisfy the interface
-	return "my string representation"
-}
-
-func (a *ArrayFlag) Set(value string) error {
-	*a = append(*a, strings.TrimSpace(value))
-	return nil
+func New(arr []string) *ArrayFlag {
+	a := ArrayFlag{}
+	a = arr
+	return &a
 }
 
 func (a *ArrayFlag) ToHeaderMap(json bool) (map[string][]string, string) {
