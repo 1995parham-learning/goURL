@@ -40,6 +40,7 @@ var rootCmd = &cobra.Command{
 			body = string(dat)
 		}
 
+		fmt.Println(headers)
 		headerFlags := http.New(headers)
 		queryFlags := http.New(queries)
 
@@ -81,7 +82,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.goURL.yaml)")
 
 	rootCmd.PersistentFlags().StringVarP(&method, "method", "M", "GET", "specify your method")
-	rootCmd.PersistentFlags().StringVarP(&method, "data", "D", "", "specify your body")
+	rootCmd.PersistentFlags().StringVarP(&body, "data", "D", "", "specify your body")
 	rootCmd.PersistentFlags().BoolVar(&json, "json", false, "specify Content-Type header as application/json")
 	rootCmd.PersistentFlags().StringVar(&method, "file", "", "specify a file path to put the file as the request body")
 	rootCmd.PersistentFlags().IntVar(&timeout, "timeout", 1000, "specify timeout")
