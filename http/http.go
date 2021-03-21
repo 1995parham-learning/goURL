@@ -83,10 +83,10 @@ type Client struct {
 	Header  map[string][]string
 	Query   map[string]string
 	Body    string
-	Timeout int
+	Timeout time.Duration
 }
 
-func NewClient(method string, url string, header map[string][]string, query map[string]string, body string, timeout int) *Client {
+func NewClient(method string, url string, header map[string][]string, query map[string]string, body string, timeout time.Duration) *Client {
 	if method != GET && method != POST && method != PATCH && method != PUT && method != DELETE {
 		panic("Method is not recognized. Use GET, POST, PUT, PATCH and DELETE instead")
 	}

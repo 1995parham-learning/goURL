@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"time"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -68,7 +69,7 @@ var method string
 var body string
 var json bool
 var file string
-var timeout int
+var timeout time.Duration
 var headers []string
 var queries []string
 
@@ -84,8 +85,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&method, "method", "M", "GET", "specify your method")
 	rootCmd.PersistentFlags().StringVarP(&body, "data", "D", "", "specify your body")
 	rootCmd.PersistentFlags().BoolVar(&json, "json", false, "specify Content-Type header as application/json")
-	rootCmd.PersistentFlags().StringVar(&method, "file", "", "specify a file path to put the file as the request body")
-	rootCmd.PersistentFlags().IntVar(&timeout, "timeout", 1000, "specify timeout")
+	rootCmd.PersistentFlags().StringVar(&file, "file", "", "specify a file path to put the file as the request body")
+	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", 1000, "specify timeout")
 	rootCmd.PersistentFlags().StringSliceVarP(&headers, "headers", "H", nil, "specify header")
 	rootCmd.PersistentFlags().StringSliceVarP(&queries, "queries", "Q", nil, "specify queries")
 }
