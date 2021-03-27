@@ -33,19 +33,35 @@ var rootCmd = &cobra.Command{
 			fmt.Println("URL is not in valid format")
 		}
 
+		var body string
+		var format string
+
 		if file != "" {
 			dat, err := ioutil.ReadFile(file)
 			if err != nil {
 				panic(err)
 			}
 
+			format = "application/octet-stream"
 			body = string(dat)
 		}
 
 		headerFlags := http.New(headers)
 		queryFlags := http.New(queries)
 
-		header, warning := headerFlags.ToHeaderMap(jsn)
+		if data != "" && jsn != "" {
+			log.Fatal("You can whether use --data or --json")
+		}
+
+		if data != "" {
+			format = "application/json"
+			body = data
+		} else {
+			format = "application/x-www-form-urlencoded"
+			body = jsn
+		}
+
+		header, warning := headerFlags.ToHeaderMap(format)
 		fmt.Println(warning)
 
 		query, warning := queryFlags.ToQueryMap()
@@ -54,7 +70,7 @@ var rootCmd = &cobra.Command{
 
 		// *******************************************************************************
 		if header["content-type"][0] == "application/x-www-form-urlencoded" {
-			match, err := regexp.MatchString("([^&]+=[^&]*(&[^&]+=[^&]*)*)?", body)
+			match, err := regexp.MatchString("([^&]+=[^&]*(&[^&]+=[^&]*)*)?", data)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -62,9 +78,9 @@ var rootCmd = &cobra.Command{
 			if !match {
 				fmt.Println("Your body is not in the default format x-www-form-urlencoded")
 			}
-		}else {
+		} else {
 			var js map[string]interface{}
-			if json.Unmarshal([]byte(body), &js) != nil {
+			if json.Unmarshal([]byte(data), &js) != nil {
 				fmt.Println("Your body is not in the json format")
 			}
 		}
@@ -83,8 +99,8 @@ func Execute() {
 }
 
 var method string
-var body string
-var jsn bool
+var data string
+var jsn string
 var file string
 var timeout time.Duration
 var headers []string
@@ -100,10 +116,10 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.goURL.yaml)")
 
 	rootCmd.PersistentFlags().StringVarP(&method, "method", "M", "GET", "specify your method")
-	rootCmd.PersistentFlags().StringVarP(&body, "data", "D", "", "specify your body")
-	rootCmd.PersistentFlags().BoolVar(&jsn, "json", false, "specify Content-Type header as application/jsn")
-	rootCmd.PersistentFlags().StringVar(&file, "file", "", "specify a file path to put the file as the request body")
-	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", 1000, "specify timeout")
+	rootCmd.PersistentFlags().StringVarP(&data, "data", "D", "", "specify your data with Content-Type header as application/x-www-form-urlencoded")
+	rootCmd.PersistentFlags().StringVar(&jsn, "json", "", "specify your body with Content-Type header as application/json")
+	rootCmd.PersistentFlags().StringVar(&file, "file", "", "specify a file path to put the file as the request data")
+	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", 0, "specify timeout")
 	rootCmd.PersistentFlags().StringSliceVarP(&headers, "headers", "H", nil, "specify header")
 	rootCmd.PersistentFlags().StringSliceVarP(&queries, "queries", "Q", nil, "specify queries")
 }

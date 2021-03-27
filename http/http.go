@@ -20,27 +20,23 @@ func New(arr []string) *ArrayFlag {
 	return &a
 }
 
-func (a *ArrayFlag) ToHeaderMap(json bool) (map[string][]string, string) {
+func (a *ArrayFlag) ToHeaderMap(format string) (map[string][]string, string) {
 	header := make(map[string][]string)
 	warning := ""
 
 	for _, f := range *a {
-			keyValue := strings.Split(f, ":")
-			_, ok := header[strings.ToLower(keyValue[0])]
-			if ok {
-				warning += fmt.Sprintf("%s is a repetead header so only the last one is considered", keyValue[0])
-			}
+		keyValue := strings.Split(f, ":")
+		_, ok := header[strings.ToLower(keyValue[0])]
+		if ok {
+			warning += fmt.Sprintf("%s is a repetead header so only the last one is considered", keyValue[0])
+		}
 
-			header[strings.ToLower(keyValue[0])] = []string{keyValue[1]}
+		header[strings.ToLower(keyValue[0])] = []string{keyValue[1]}
 	}
 
 	_, ok := header["content-type"]
-	if !ok {
-		if json {
-			header["content-type"] = []string{"application/json"}
-		} else {
-			header["content-type"] = []string{"application/x-www-form-urlencoded"}
-		}
+	if !ok && format != ""{
+		header["content-type"] = []string{format}
 	}
 
 	return header, warning
@@ -107,14 +103,13 @@ func NewClient(method string, url string, header map[string][]string, query map[
 }
 
 func (c *Client) Do() {
-	client := &http.Client{}
+	client := &http.Client{Transport: &http.Transport{
+		ResponseHeaderTimeout:  time.Second*c.Timeout,
+	}}
 
 	fmt.Println(c.URL)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * time.Duration(c.Timeout))
-	defer cancel()
-
-	req, err := http.NewRequestWithContext(ctx, c.Method, c.URL, bytes.NewBuffer([]byte(c.Body)))
+	req, err := http.NewRequest(c.Method, c.URL, bytes.NewBuffer([]byte(c.Body)))
 	if err != nil {
 		panic(err)
 	}
@@ -135,7 +130,7 @@ func (c *Client) Do() {
 	fmt.Println("Response status:", resp.Status)
 	fmt.Println("headers are:")
 
-	for k, v := range resp.Header{
+	for k, v := range resp.Header {
 		fmt.Println(fmt.Sprintf("%s = %s", k, v))
 	}
 
