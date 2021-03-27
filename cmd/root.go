@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/spf13/cobra"
 	"goURL/http"
 	"io/ioutil"
 	"log"
@@ -11,6 +11,7 @@ import (
 	"time"
 
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -41,16 +42,32 @@ var rootCmd = &cobra.Command{
 			body = string(dat)
 		}
 
-		fmt.Println(headers)
 		headerFlags := http.New(headers)
 		queryFlags := http.New(queries)
 
-		header, warning := headerFlags.ToHeaderMap(json)
+		header, warning := headerFlags.ToHeaderMap(jsn)
 		fmt.Println(warning)
 
 		query, warning := queryFlags.ToQueryMap()
 		fmt.Println(warning)
 		//url.Parse()
+
+		// *******************************************************************************
+		if header["content-type"][0] == "application/x-www-form-urlencoded" {
+			match, err := regexp.MatchString("([^&]+=[^&]*(&[^&]+=[^&]*)*)?", body)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			if !match {
+				fmt.Println("Your body is not in the default format x-www-form-urlencoded")
+			}
+		}else {
+			var js map[string]interface{}
+			if json.Unmarshal([]byte(body), &js) != nil {
+				fmt.Println("Your body is not in the json format")
+			}
+		}
 
 		client := http.NewClient(method, URL, header, query, body, timeout)
 		client.Do()
@@ -67,7 +84,7 @@ func Execute() {
 
 var method string
 var body string
-var json bool
+var jsn bool
 var file string
 var timeout time.Duration
 var headers []string
@@ -84,7 +101,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&method, "method", "M", "GET", "specify your method")
 	rootCmd.PersistentFlags().StringVarP(&body, "data", "D", "", "specify your body")
-	rootCmd.PersistentFlags().BoolVar(&json, "json", false, "specify Content-Type header as application/json")
+	rootCmd.PersistentFlags().BoolVar(&jsn, "json", false, "specify Content-Type header as application/jsn")
 	rootCmd.PersistentFlags().StringVar(&file, "file", "", "specify a file path to put the file as the request body")
 	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", 1000, "specify timeout")
 	rootCmd.PersistentFlags().StringSliceVarP(&headers, "headers", "H", nil, "specify header")

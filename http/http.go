@@ -25,16 +25,13 @@ func (a *ArrayFlag) ToHeaderMap(json bool) (map[string][]string, string) {
 	warning := ""
 
 	for _, f := range *a {
-		a := strings.Split(f, ",")
-		for _, b := range a {
-			keyValue := strings.Split(b, ":")
-			_, ok := header[keyValue[0]]
+			keyValue := strings.Split(f, ":")
+			_, ok := header[strings.ToLower(keyValue[0])]
 			if ok {
 				warning += fmt.Sprintf("%s is a repetead header so only the last one is considered", keyValue[0])
 			}
 
-			header[keyValue[0]] = []string{keyValue[1]}
-		}
+			header[strings.ToLower(keyValue[0])] = []string{keyValue[1]}
 	}
 
 	_, ok := header["content-type"]
@@ -42,7 +39,7 @@ func (a *ArrayFlag) ToHeaderMap(json bool) (map[string][]string, string) {
 		if json {
 			header["content-type"] = []string{"application/json"}
 		} else {
-			header["content-type"] = []string{"x-www-form-urlencoded"}
+			header["content-type"] = []string{"application/x-www-form-urlencoded"}
 		}
 	}
 
@@ -57,12 +54,12 @@ func (a *ArrayFlag) ToQueryMap() (map[string]string, string) {
 		a := strings.Split(q, "&")
 		for _, b := range a {
 			keyValue := strings.Split(b, "=")
-			_, ok := query[keyValue[0]]
+			_, ok := query[strings.ToLower(keyValue[0])]
 			if ok {
-				warning += fmt.Sprintf("%s is a repetead header so only the last one is considered", keyValue[0])
+				warning += fmt.Sprintf("%s is a repetead query parameter so only the last one is considered", keyValue[0])
 			}
 
-			query[keyValue[0]] = keyValue[1]
+			query[strings.ToLower(keyValue[0])] = keyValue[1]
 		}
 	}
 
