@@ -140,13 +140,12 @@ func (c *Client) Do() {
 	rd := resp.Body
 
 	size, err := strconv.Atoi(resp.Header.Get("Content-Length"))
-	fmt.Println(size)
-	fmt.Println("parrrrrrrrrrrrrrrhaaaaaaaaaaaaaammmmmmmmmmmm")
-	if err != nil && size > 0 {
+	if err == nil && size > 0 {
 		// start new bar
 		bar := pb.New(size)
 		bar.Set(pb.Bytes, true)
 		bar.Start()
+
 		// create proxy reader
 		rd = bar.NewProxyReader(resp.Body)
 	}
