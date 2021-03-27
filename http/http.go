@@ -7,8 +7,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 // Created so that multiple inputs can be accecpted
@@ -35,7 +38,7 @@ func (a *ArrayFlag) ToHeaderMap(format string) (map[string][]string, string) {
 	}
 
 	_, ok := header["content-type"]
-	if !ok && format != ""{
+	if !ok && format != "" {
 		header["content-type"] = []string{format}
 	}
 
@@ -104,7 +107,7 @@ func NewClient(method string, url string, header map[string][]string, query map[
 
 func (c *Client) Do() {
 	client := &http.Client{Transport: &http.Transport{
-		ResponseHeaderTimeout:  time.Second*c.Timeout,
+		ResponseHeaderTimeout: time.Second * c.Timeout,
 	}}
 
 	fmt.Println(c.URL)
@@ -134,7 +137,21 @@ func (c *Client) Do() {
 		fmt.Println(fmt.Sprintf("%s = %s", k, v))
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	rd := resp.Body
+
+	size, err := strconv.Atoi(resp.Header.Get("Content-Length"))
+	fmt.Println(size)
+	fmt.Println("parrrrrrrrrrrrrrrhaaaaaaaaaaaaaammmmmmmmmmmm")
+	if err != nil && size > 0 {
+		// start new bar
+		bar := pb.New(size)
+		bar.Set(pb.Bytes, true)
+		bar.Start()
+		// create proxy reader
+		rd = bar.NewProxyReader(resp.Body)
+	}
+
+	body, err := ioutil.ReadAll(rd)
 	if err != nil {
 		log.Fatalln(err)
 	}
