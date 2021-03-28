@@ -1,6 +1,6 @@
 package main
 
-import "goURL/cmd"
+import "github.com/elahe-dastan/goURL/cmd"
 
 func main() {
 	cmd.Execute()
