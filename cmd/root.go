@@ -3,19 +3,24 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"goURL/http"
 	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
 	"time"
 
+	"github.com/elahe-dastan/goURL/array"
+	"github.com/elahe-dastan/goURL/http"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	validURL = regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)`)
+	cfgFile  string
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -24,13 +29,16 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// The first argument is always the URL
 		if len(os.Args) == 1 {
-			fmt.Println("URL is not given")
+			logrus.Error("URL is not given")
+
 			return
 		}
 
 		URL := os.Args[1]
 		if !Validate(URL) {
-			fmt.Println("URL is not in valid format")
+			logrus.Error("URL isn't valid")
+
+			return
 		}
 
 		var body string
@@ -46,11 +54,13 @@ var rootCmd = &cobra.Command{
 			body = string(dat)
 		}
 
-		headerFlags := http.New(headers)
-		queryFlags := http.New(queries)
+		headerFlags := array.New(headers)
+		queryFlags := array.New(queries)
 
 		if data != "" && jsn != "" {
-			log.Fatal("You can whether use --data or --json")
+			logrus.Error("You can whether use --data or --json")
+
+			return
 		}
 
 		if data != "" {
@@ -62,11 +72,10 @@ var rootCmd = &cobra.Command{
 		}
 
 		header, warning := headerFlags.ToHeaderMap(format)
-		fmt.Println(warning)
+		logrus.Warn(warning)
 
 		query, warning := queryFlags.ToQueryMap()
-		fmt.Println(warning)
-		//url.Parse()
+		logrus.Warn(warning)
 
 		// *******************************************************************************
 		if header["content-type"][0] == "application/x-www-form-urlencoded" {
@@ -86,7 +95,11 @@ var rootCmd = &cobra.Command{
 		}
 
 		client := http.NewClient(method, URL, header, query, body, timeout)
-		client.Do()
+		if err := client.Do(); err != nil {
+			logrus.Error(err)
+
+			return
+		}
 	},
 }
 
@@ -150,7 +163,5 @@ func initConfig() {
 }
 
 func Validate(url string) bool {
-	var validURL = regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)`)
-
 	return validURL.MatchString(url)
 }
