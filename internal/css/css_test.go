@@ -10,14 +10,32 @@ func TestColonSeparatedStrings(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name     string
-		input    []string
-		expected map[string]string
+		name      string
+		input     []string
+		colon     string
+		separator string
+		expected  map[string]string
 	}{
 		{
-			name:     "simple",
-			input:    []string{"hello:world", "salam:donya"},
-			expected: map[string]string{"hello": "world", "salam": "donya"},
+			name:      "simple",
+			input:     []string{"hello:world", "salam:donya"},
+			separator: "",
+			colon:     ":",
+			expected:  map[string]string{"hello": "world", "salam": "donya"},
+		},
+		{
+			name:      "with separator",
+			input:     []string{"hello:world,salam:donya"},
+			separator: ",",
+			colon:     ":",
+			expected:  map[string]string{"hello": "world", "salam": "donya"},
+		},
+		{
+			name:      "with separator and colon",
+			input:     []string{"hello=world&salam=donya"},
+			separator: "&",
+			colon:     "=",
+			expected:  map[string]string{"hello": "world", "salam": "donya"},
 		},
 	}
 
@@ -26,7 +44,7 @@ func TestColonSeparatedStrings(t *testing.T) {
 
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			result, err := css.ColonSeparatedStrings(test.input).ToMap()
+			result, err := css.NewWithOptions(test.input, test.colon, test.separator).ToMap()
 			if err != nil {
 				t.Fatalf("ToMap(%s) has error: %s", test.input, err)
 			}
