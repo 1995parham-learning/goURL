@@ -65,13 +65,13 @@ func NewClient(
 func (c *Client) Do() (*http.Response, error) {
 	client := &http.Client{
 		Transport: &http.Transport{
-			ResponseHeaderTimeout: time.Second * c.Timeout,
+			ResponseHeaderTimeout: c.Timeout,
 		},
 	}
 
 	logrus.Infof("sending request into %s", c.URL)
 
-	req, err := http.NewRequest(c.Method, c.URL, bytes.NewBuffer([]byte(c.Body)))
+	req, err := http.NewRequestWithContext(context.Background(), c.Method, c.URL, bytes.NewBuffer([]byte(c.Body)))
 	if err != nil {
 		return nil, fmt.Errorf("request creation failed: %w", err)
 	}
