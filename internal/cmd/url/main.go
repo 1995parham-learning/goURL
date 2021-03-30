@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/url"
 	"regexp"
-	"strconv"
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/elahe-dastan/goURL/internal/css"
@@ -65,8 +64,7 @@ func main(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	var body string
-	var format string
+	var body, format string
 
 	if file != "" {
 		dat, err := ioutil.ReadFile(file)
@@ -124,7 +122,7 @@ func main(cmd *cobra.Command, args []string) {
 	case "application/json":
 		// only validate the json by parsing it
 		var js map[string]interface{}
-		if err := json.Unmarshal([]byte(data), &js); err != nil {
+		if err := json.Unmarshal([]byte(jsonData), &js); err != nil {
 			logrus.Errorf("your body is not in the json format: %s", err)
 		}
 	}
@@ -142,12 +140,11 @@ func main(cmd *cobra.Command, args []string) {
 
 	rd := resp.Body
 
-	size, err := strconv.Atoi(resp.Header.Get("Content-Length"))
-	if err == nil && size > 0 {
+	var bar *pb.ProgressBar
+
+	if resp.ContentLength > 0 {
 		// start a new progress bar
-		bar := pb.New(size)
-		bar.Set(pb.Bytes, true)
-		bar.Start()
+		bar = pb.Full.Start64(resp.ContentLength)
 
 		// creates a proxy reader for showing the progress bar
 		rd = bar.NewProxyReader(resp.Body)
@@ -158,6 +155,10 @@ func main(cmd *cobra.Command, args []string) {
 		logrus.Errorf("reading body failed: %s", err)
 
 		return
+	}
+
+	if bar != nil {
+		bar.Finish()
 	}
 
 	cmd.Println(string(respBody))
