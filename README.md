@@ -105,7 +105,7 @@ INFO[0001] Access-Control-Allow-Credentials = [true]
 4. GET Request with Query Strings
 
 ```sh
-> ./gourl https://httpbin.org/get -X GET -Q 'hello:world' -Q 'salam:donya'
+> ./gourl https://httpbin.org/get -X GET -Q 'hello=world' -Q 'salam=donya'
 
 INFO[0000] sending request into https://httpbin.org/get?hello=world&salam=donya
 INFO[0001] Method is: GET
