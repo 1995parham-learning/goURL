@@ -132,3 +132,78 @@ INFO[0001] Access-Control-Allow-Credentials = [true]
   "url": "https://httpbin.org/get?hello=world&salam=donya"
 }
 ```
+
+5. Invalid Request
+```sh
+> ./gourl httpj://httpbin.org/
+
+INFO[0000] sending request into httpj://httpbin.org/
+ERRO[0000] request failed: Get "httpj://httpbin.org/": unsupported protocol scheme "httpj"
+```
+
+6. Invalid JSON Body
+```sh
+> ./gourl https://httpbin.org/post -X POST -j '{ "hello": "world }'
+
+ERRO[0000] your body is not in the json format: unexpected end of JSON input
+INFO[0000] sending request into https://httpbin.org/post
+INFO[0001] Method is: POST
+INFO[0001] Response status: 200 OK
+INFO[0001] headers are:
+INFO[0001] Date = [Tue, 30 Mar 2021 15:51:26 GMT]
+INFO[0001] Content-Type = [application/json]
+INFO[0001] Content-Length = [429]
+INFO[0001] Server = [gunicorn/19.9.0]
+INFO[0001] Access-Control-Allow-Origin = [*]
+INFO[0001] Access-Control-Allow-Credentials = [true]
+{
+  "args": {},
+  "data": "{ \"hello\": \"world }",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept-Encoding": "gzip",
+    "Content-Length": "19",
+    "Content-Type": "application/json",
+    "Host": "httpbin.org",
+    "User-Agent": "Go-http-client/2.0",
+    "X-Amzn-Trace-Id": "Root=1-606348fe-2741175600ec1e5706a0b4cb"
+  },
+  "json": null,
+  "origin": "94.139.160.188",
+  "url": "https://httpbin.org/post"
+}
+```
+
+7. Timeout (do not wait for headers)
+```sh
+> ./gourl https://httpbin.org/delay/10 -t 1s 
+
+INFO[0000] sending request into https://httpbin.org/delay/10
+ERRO[0001] request failed: Get "https://httpbin.org/delay/10": http2: timeout awaiting response headers
+```
+
+8. Timeout (wait for body)
+```sh
+> ./gourl https://httpbin.org/stream/10 -t 1s
+
+INFO[0000] sending request into https://httpbin.org/stream/10
+INFO[0000] Method is: GET
+INFO[0000] Response status: 200 OK
+INFO[0000] headers are:
+INFO[0000] Date = [Tue, 30 Mar 2021 16:16:20 GMT]
+INFO[0000] Content-Type = [application/json]
+INFO[0000] Server = [gunicorn/19.9.0]
+INFO[0000] Access-Control-Allow-Origin = [*]
+INFO[0000] Access-Control-Allow-Credentials = [true]
+{"url": "https://httpbin.org/stream/10", "args": {}, "headers": {"Host": "httpbin.org", "X-Amzn-Trace-Id": "Root=1-60634ed4-18bb3d5174fc841b7883a7f1", "Accept-Encoding": "gzip", "User-Agent": "Go-http-client/2.0"}, "origin": "94.139.160.188", "id": 0}
+{"url": "https://httpbin.org/stream/10", "args": {}, "headers": {"Host": "httpbin.org", "X-Amzn-Trace-Id": "Root=1-60634ed4-18bb3d5174fc841b7883a7f1", "Accept-Encoding": "gzip", "User-Agent": "Go-http-client/2.0"}, "origin": "94.139.160.188", "id": 1}
+{"url": "https://httpbin.org/stream/10", "args": {}, "headers": {"Host": "httpbin.org", "X-Amzn-Trace-Id": "Root=1-60634ed4-18bb3d5174fc841b7883a7f1", "Accept-Encoding": "gzip", "User-Agent": "Go-http-client/2.0"}, "origin": "94.139.160.188", "id": 2}
+{"url": "https://httpbin.org/stream/10", "args": {}, "headers": {"Host": "httpbin.org", "X-Amzn-Trace-Id": "Root=1-60634ed4-18bb3d5174fc841b7883a7f1", "Accept-Encoding": "gzip", "User-Agent": "Go-http-client/2.0"}, "origin": "94.139.160.188", "id": 3}
+{"url": "https://httpbin.org/stream/10", "args": {}, "headers": {"Host": "httpbin.org", "X-Amzn-Trace-Id": "Root=1-60634ed4-18bb3d5174fc841b7883a7f1", "Accept-Encoding": "gzip", "User-Agent": "Go-http-client/2.0"}, "origin": "94.139.160.188", "id": 4}
+{"url": "https://httpbin.org/stream/10", "args": {}, "headers": {"Host": "httpbin.org", "X-Amzn-Trace-Id": "Root=1-60634ed4-18bb3d5174fc841b7883a7f1", "Accept-Encoding": "gzip", "User-Agent": "Go-http-client/2.0"}, "origin": "94.139.160.188", "id": 5}
+{"url": "https://httpbin.org/stream/10", "args": {}, "headers": {"Host": "httpbin.org", "X-Amzn-Trace-Id": "Root=1-60634ed4-18bb3d5174fc841b7883a7f1", "Accept-Encoding": "gzip", "User-Agent": "Go-http-client/2.0"}, "origin": "94.139.160.188", "id": 6}
+{"url": "https://httpbin.org/stream/10", "args": {}, "headers": {"Host": "httpbin.org", "X-Amzn-Trace-Id": "Root=1-60634ed4-18bb3d5174fc841b7883a7f1", "Accept-Encoding": "gzip", "User-Agent": "Go-http-client/2.0"}, "origin": "94.139.160.188", "id": 7}
+{"url": "https://httpbin.org/stream/10", "args": {}, "headers": {"Host": "httpbin.org", "X-Amzn-Trace-Id": "Root=1-60634ed4-18bb3d5174fc841b7883a7f1", "Accept-Encoding": "gzip", "User-Agent": "Go-http-client/2.0"}, "origin": "94.139.160.188", "id": 8}
+{"url": "https://httpbin.org/stream/10", "args": {}, "headers": {"Host": "httpbin.org", "X-Amzn-Trace-Id": "Root=1-60634ed4-18bb3d5174fc841b7883a7f1", "Accept-Encoding": "gzip", "User-Agent": "Go-http-client/2.0"}, "origin": "94.139.160.188", "id": 9}
+```
