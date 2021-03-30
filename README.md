@@ -4,9 +4,18 @@
 
 GoURL is written as IE Spring 2021 course project to simulate the curl behaviour in Go.
 
+## How To Run
+
+```sh
+cd cmd/gourl
+
+go build
+```
+
 ## Examples
 
 1. GET Request
+
 ```sh
 > ./gourl https://httpbin.org/get
 
@@ -34,6 +43,7 @@ INFO[0000] Access-Control-Allow-Credentials = [true]
 ```
 
 2. POST Request with JSON body and `Content-Type` automatically is set to `application/json`.
+
 ```sh
 > ./gourl https://httpbin.org/post -X POST -j '{ "hello": "world" }'
 
@@ -69,6 +79,7 @@ INFO[0001] Content-Type = [application/json]
 ```
 
 3. POST Request with Form body and `Content-Type` automatically is set to `application/x-www-form-urlencoded`.
+
 ```sh
 > ./gourl https://httpbin.org/post -X POST -d 'hello=world'
 
@@ -102,6 +113,7 @@ INFO[0001] Access-Control-Allow-Credentials = [true]
   "url": "https://httpbin.org/post"
 }
 ```
+
 4. GET Request with Query Strings
 
 ```sh
@@ -134,6 +146,7 @@ INFO[0001] Access-Control-Allow-Credentials = [true]
 ```
 
 5. Invalid Request
+
 ```sh
 > ./gourl httpj://httpbin.org/
 
@@ -142,6 +155,7 @@ ERRO[0000] request failed: Get "httpj://httpbin.org/": unsupported protocol sche
 ```
 
 6. Invalid JSON Body
+
 ```sh
 > ./gourl https://httpbin.org/post -X POST -j '{ "hello": "world }'
 
@@ -176,14 +190,16 @@ INFO[0001] Access-Control-Allow-Credentials = [true]
 ```
 
 7. Timeout (do not wait for headers)
+
 ```sh
-> ./gourl https://httpbin.org/delay/10 -t 1s 
+> ./gourl https://httpbin.org/delay/10 -t 1s
 
 INFO[0000] sending request into https://httpbin.org/delay/10
 ERRO[0001] request failed: Get "https://httpbin.org/delay/10": http2: timeout awaiting response headers
 ```
 
 8. Timeout (wait for body)
+
 ```sh
 > ./gourl https://httpbin.org/stream/10 -t 1s
 
