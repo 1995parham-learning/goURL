@@ -94,12 +94,12 @@ func main(cmd *cobra.Command, args []string) {
 		format = "application/octet-stream"
 	}
 
-	h, err := css.ColonSeparatedStrings(headers).ToMap()
+	h, err := css.NewWithOptions(headers, ":", ",").ToMap()
 	if err != nil {
 		logrus.Warn(err)
 	}
 
-	q, err := css.ColonSeparatedStrings(queries).ToMap()
+	q, err := css.NewWithOptions(queries, "=", "&").ToMap()
 	if err != nil {
 		logrus.Warn(err)
 	}
