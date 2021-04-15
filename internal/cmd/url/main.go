@@ -20,14 +20,15 @@ const (
 	TimeoutFlag = "timeout"
 	HeaderFlag  = "header"
 	QueryFlag   = "query"
+	FileFlag    = "file"
 )
 
+// nolint: funlen, cyclop
 func main(cmd *cobra.Command, args []string) {
-	var file string
-
 	method, _ := cmd.Flags().GetString(MethodFlag)
 	data, _ := cmd.Flags().GetString(DataFlag)
 	jsonData, _ := cmd.Flags().GetString(JSONFlag)
+	file, _ := cmd.Flags().GetString(FileFlag)
 
 	timeout, err := cmd.Flags().GetDuration(TimeoutFlag)
 	if err != nil {
@@ -58,10 +59,18 @@ func main(cmd *cobra.Command, args []string) {
 	}
 
 	URL := args[0]
-	if _, err := url.Parse(URL); err != nil {
-		logrus.Errorf("URL isn't valid %s", err)
+	{
+		u, err := url.Parse(URL)
+		if err != nil {
+			logrus.Errorf("URL isn't valid %s", err)
 
-		return
+			return
+		}
+		if u.Scheme != "https" && u.Scheme != "http" {
+			logrus.Errorf("URL isn't valid because of incorrect scheme")
+
+			return
+		}
 	}
 
 	var body, format string
@@ -111,7 +120,7 @@ func main(cmd *cobra.Command, args []string) {
 	switch h["Content-Type"] {
 	case "application/x-www-form-urlencoded":
 		// validate form data by a regular expression
-		match, err := regexp.MatchString("([^&]+=[^&]*(&[^&]+=[^&]*)*)?", data)
+		match, err := regexp.MatchString("^([^&]+=[^&]*(&[^&]+=[^&]*)*)?$", data)
 		if err != nil {
 			logrus.Fatal(err)
 		}

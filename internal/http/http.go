@@ -63,6 +63,7 @@ func NewClient(
 }
 
 func (c *Client) Do() (*http.Response, error) {
+	// nolint: exhaustivestruct
 	client := &http.Client{
 		Transport: &http.Transport{
 			ResponseHeaderTimeout: c.Timeout,
