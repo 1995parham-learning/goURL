@@ -3,7 +3,7 @@ package cmd
 import (
 	"log"
 
-	"github.com/elahe-dastan/goURL/internal/cmd/url"
+	"github.com/1995parham-learning/gourl/internal/cmd/url"
 )
 
 func Execute() {

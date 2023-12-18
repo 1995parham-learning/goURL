@@ -3,7 +3,7 @@ package css_test
 import (
 	"testing"
 
-	"github.com/elahe-dastan/goURL/internal/css"
+	"github.com/1995parham-learning/gourl/internal/css"
 )
 
 func TestColonSeparatedStrings(t *testing.T) {
@@ -18,24 +18,24 @@ func TestColonSeparatedStrings(t *testing.T) {
 	}{
 		{
 			name:      "simple",
-			input:     []string{"hello:world", "salam:donya"},
+			input:     []string{"hello:world", "1:2"},
 			separator: "",
 			colon:     ":",
-			expected:  map[string]string{"hello": "world", "salam": "donya"},
+			expected:  map[string]string{"hello": "world", "1": "2"},
 		},
 		{
 			name:      "with separator",
-			input:     []string{"hello:world,salam:donya"},
+			input:     []string{"hello:world,1:2"},
 			separator: ",",
 			colon:     ":",
-			expected:  map[string]string{"hello": "world", "salam": "donya"},
+			expected:  map[string]string{"hello": "world", "1": "2"},
 		},
 		{
 			name:      "with separator and colon",
-			input:     []string{"hello=world&salam=donya"},
+			input:     []string{"hello=world&1=2"},
 			separator: "&",
 			colon:     "=",
-			expected:  map[string]string{"hello": "world", "salam": "donya"},
+			expected:  map[string]string{"hello": "world", "1": "2"},
 		},
 	}
 

@@ -2,13 +2,14 @@ package url
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/url"
+	"os"
 	"regexp"
 
+	"github.com/1995parham-learning/gourl/internal/css"
+	"github.com/1995parham-learning/gourl/internal/http"
 	"github.com/cheggaaa/pb/v3"
-	"github.com/elahe-dastan/goURL/internal/css"
-	"github.com/elahe-dastan/goURL/internal/http"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -76,9 +77,9 @@ func main(cmd *cobra.Command, args []string) {
 	var body, format string
 
 	if file != "" {
-		dat, err := ioutil.ReadFile(file)
+		dat, err := os.ReadFile(file)
 		if err != nil {
-			logrus.Errorf("cannout read %s: %s", file, err)
+			logrus.Errorf("cannot read %s: %s", file, err)
 
 			return
 		}
@@ -159,7 +160,7 @@ func main(cmd *cobra.Command, args []string) {
 		rd = bar.NewProxyReader(resp.Body)
 	}
 
-	respBody, err := ioutil.ReadAll(rd)
+	respBody, err := io.ReadAll(rd)
 	if err != nil {
 		logrus.Errorf("reading body failed: %s", err)
 

@@ -2,23 +2,25 @@
 
 ## Introduction
 
-GoURL is written as IE Spring 2021 course project to simulate the curl behaviour in Go.
+`gourl` simulate `curl` behavior in Go.
 
 ## How To Run
 
-```sh
-cd cmd/gourl
-
-go build
+```bash
+just build
 ```
 
 ## Examples
 
-1. GET Request
+These are examples of using `gourl` in different situations.
 
-```sh
-> ./gourl https://httpbin.org/get
+- GET Request
 
+```bash
+./gourl https://httpbin.org/get
+```
+
+```log
 INFO[0000] sending request into https://httpbin.org/get
 INFO[0000] Method is: GET
 INFO[0000] Response status: 200 OK
@@ -42,11 +44,13 @@ INFO[0000] Access-Control-Allow-Credentials = [true]
 }
 ```
 
-2. POST Request with JSON body and `Content-Type` automatically is set to `application/json`.
+- POST Request with JSON body and `Content-Type` automatically is set to `application/json`.
 
-```sh
-> ./gourl https://httpbin.org/post -X POST -j '{ "hello": "world" }'
+```bash
+./gourl https://httpbin.org/post -X POST -j '{ "hello": "world" }'
+```
 
+```log
 INFO[0000] sending request into https://httpbin.org/post
 INFO[0001] Method is: POST
 INFO[0001] Response status: 200 OK
@@ -78,11 +82,13 @@ INFO[0001] Content-Type = [application/json]
 }
 ```
 
-3. POST Request with Form body and `Content-Type` automatically is set to `application/x-www-form-urlencoded`.
+- POST Request with Form body and `Content-Type` automatically is set to `application/x-www-form-urlencoded`.
 
-```sh
-> ./gourl https://httpbin.org/post -X POST -d 'hello=world'
+```bash
+./gourl https://httpbin.org/post -X POST -d 'hello=world'
+```
 
+```log
 INFO[0000] sending request into https://httpbin.org/post
 INFO[0001] Method is: POST
 INFO[0001] Response status: 200 OK
@@ -114,11 +120,13 @@ INFO[0001] Access-Control-Allow-Credentials = [true]
 }
 ```
 
-4. GET Request with Query Strings
+- GET Request with Query Strings
 
-```sh
-> ./gourl https://httpbin.org/get -X GET -Q 'hello=world' -Q 'salam=donya'
+```bash
+./gourl https://httpbin.org/get -X GET -Q 'hello=world' -Q 'salam=donya'
+```
 
+```log
 INFO[0000] sending request into https://httpbin.org/get?hello=world&salam=donya
 INFO[0001] Method is: GET
 INFO[0001] Response status: 200 OK
@@ -145,20 +153,24 @@ INFO[0001] Access-Control-Allow-Credentials = [true]
 }
 ```
 
-5. Invalid Request
+- Invalid Request
 
-```sh
-> ./gourl httpj://httpbin.org/
+```bash
+./gourl httpj://httpbin.org/
+```
 
+```log
 INFO[0000] sending request into httpj://httpbin.org/
 ERRO[0000] request failed: Get "httpj://httpbin.org/": unsupported protocol scheme "httpj"
 ```
 
-6. Invalid JSON Body
+- Invalid JSON Body
 
-```sh
-> ./gourl https://httpbin.org/post -X POST -j '{ "hello": "world }'
+```bash
+./gourl https://httpbin.org/post -X POST -j '{ "hello": "world }'
+```
 
+```log
 ERRO[0000] your body is not in the json format: unexpected end of JSON input
 INFO[0000] sending request into https://httpbin.org/post
 INFO[0001] Method is: POST
@@ -189,20 +201,24 @@ INFO[0001] Access-Control-Allow-Credentials = [true]
 }
 ```
 
-7. Timeout (do not wait for headers)
+- Timeout (do not wait for headers)
 
-```sh
-> ./gourl https://httpbin.org/delay/10 -t 1s
+```bash
+./gourl https://httpbin.org/delay/10 -t 1s
+```
 
+```log
 INFO[0000] sending request into https://httpbin.org/delay/10
 ERRO[0001] request failed: Get "https://httpbin.org/delay/10": http2: timeout awaiting response headers
 ```
 
-8. Timeout (wait for body)
+- Timeout (wait for body)
 
-```sh
-> ./gourl https://httpbin.org/stream/10 -t 1s
+```bash
+./gourl https://httpbin.org/stream/10 -t 1s
+```
 
+```log
 INFO[0000] sending request into https://httpbin.org/stream/10
 INFO[0000] Method is: GET
 INFO[0000] Response status: 200 OK

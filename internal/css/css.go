@@ -15,6 +15,16 @@ type ColonSeparatedStrings struct {
 // ParseErrors contains errors of colon separated strings' parsing process.
 type ParseErrors []string
 
+func (pe ParseErrors) Error() string {
+	err := ""
+
+	for _, p := range pe {
+		err += fmt.Sprintln(p)
+	}
+
+	return err
+}
+
 func NewWithOptions(css []string, colon string, separator string) *ColonSeparatedStrings {
 	return &ColonSeparatedStrings{
 		array:     css,
@@ -25,16 +35,6 @@ func NewWithOptions(css []string, colon string, separator string) *ColonSeparate
 
 func New(css []string) *ColonSeparatedStrings {
 	return NewWithOptions(css, ":", "")
-}
-
-func (pe ParseErrors) Error() string {
-	err := ""
-
-	for _, p := range pe {
-		err += fmt.Sprintln(p)
-	}
-
-	return err
 }
 
 // ToMap creates a map from the array of colon separated strings.
